@@ -1,88 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model NfeLog {
-  id          Int        @id @default(autoincrement())
-  cnpj        String
-  createdAt   DateTime   @default(now())
-  cStat       String?
-  xMotivo     String?
-  ultNSU      String?
-  tpAmb       String?
-  xmlEnviado  String?    @db.Text
-  soapRaw     String?    @db.Text
-  notas       NfeNota[]
+  id         Int       @id @default(autoincrement())
+  cnpj       String
+  createdAt  DateTime  @default(now())
+  cStat      String?
+  xMotivo    String?
+  ultNSU     String?
+  tpAmb      String?
+  xmlEnviado String?
+  soapRaw    String?
+  notas      NfeNota[]
 }
 
 model NfeNota {
-  id              Int          @id @default(autoincrement())
-  numero          String       @unique
-  dataEmissao     String?
-  cUF             String?
-  cNF             String?
-  natOp           String?
-  mod             String?
-  serie           String?
-  tpNF            String?
-  idDest          String?
-  cMunFG          String?
-  tpImp           String?
-  tpEmis          String?
-  cDV             String?
-  tpAmb           String?
-  finNFe          String?
-  indFinal        String?
-  indPres         String?
-  procEmi         String?
-  verProc         String?
-
-  emitente        String?
-  cnpjEmitente    String?
-  nomeFantasia    String?
-  ieEmitente      String?
-  crtEmitente     String?
-  enderecoEmitente String?
-
-  destinatario    String?
-  cpfDestinatario String?
-  enderecoDestinatario String?
-  indIEDest       String?
-
-  valor           Float?
-  vBC             Float?
-  vICMS           Float?
-  vICMSDeson      Float?
-  vFCP            Float?
-  vProd           Float?
-
-  modFrete        String?
-  transportadora  String?
-  cnpjTransportadora String?
+  id                     Int          @id @default(autoincrement())
+  numero                 String       @unique
+  dataEmissao            String?
+  emitente               String?
+  valor                  Float?
+  logId                  Int
+  cnpjEmitente           String?
+  cpfDestinatario        String?
+  destinatario           String?
+  cnpjTransportadora     String?
+  enderecoDestinatario   String?
+  enderecoEmitente       String?
+  modFrete               String?
+  natOp                  String?
+  placaVeiculo           String?
+  transportadora         String?
+  ufVeiculo              String?
+  cDV                    String?
+  cMunFG                 String?
+  cNF                    String?
+  cUF                    String?
+  crtEmitente            String?
   enderecoTransportadora String?
-  placaVeiculo    String?
-  ufVeiculo       String?
-
-  logId           Int
-  log             NfeLog       @relation(fields: [logId], references: [id])
-  produtos        NfeProduto[]
+  finNFe                 String?
+  idDest                 String?
+  ieEmitente             String?
+  indFinal               String?
+  indIEDest              String?
+  indPres                String?
+  mod                    String?
+  nomeFantasia           String?
+  procEmi                String?
+  serie                  String?
+  tpAmb                  String?
+  tpEmis                 String?
+  tpImp                  String?
+  tpNF                   String?
+  vBC                    Float?
+  vFCP                   Float?
+  vICMS                  Float?
+  vICMSDeson             Float?
+  vProd                  Float?
+  verProc                String?
+  log                    NfeLog       @relation(fields: [logId], references: [id])
+  produtos               NfeProduto[]
 }
 
 model NfeProduto {
-  id            Int       @id @default(autoincrement())
-  nItem         Int?
+  id            Int     @id @default(autoincrement())
   codigo        String?
   descricao     String?
-  cfop          String?
-  unidade       String?
   quantidade    Float?
   valorUnitario Float?
   valorTotal    Float?
   notaId        Int
-  nota          NfeNota   @relation(fields: [notaId], references: [id])
+  cfop          String?
+  unidade       String?
+  nItem         Int?
+  nota          NfeNota @relation(fields: [notaId], references: [id])
 }

@@ -579,6 +579,110 @@ export class SefazService {
     }
   }
 
+
+  /** 🔍 Consulta única de NF-e por chave (sem XLSX) */
+async consultarPorChave({
+  chave,
+  cnpj,
+  password,
+  state = "SP",
+  tpAmb = "1",
+  certificateFile,
+}: {
+  chave: string;
+  cnpj: string;
+  password: string;
+  state?: string;
+  tpAmb?: string;
+  certificateFile: Express.Multer.File;
+}) {
+  const logs: any = { chave };
+  try {
+    const https = require("https");
+    const axios = require("axios");
+    const { xml2js } = require("xml-js");
+
+    const httpsAgent = new https.Agent({
+      pfx: certificateFile.buffer,
+      passphrase: password,
+      rejectUnauthorized: false,
+      minVersion: "TLSv1.2",
+    });
+
+    const endpoint =
+      tpAmb === "2"
+        ? "https://hom.nfe.fazenda.gov.br/NFeConsultaProtocolo4/NFeConsultaProtocolo4.asmx"
+        : "https://www.nfe.fazenda.gov.br/NFeConsultaProtocolo4/NFeConsultaProtocolo4.asmx";
+
+    const xmlBody = `
+      <consSitNFe xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
+        <tpAmb>${tpAmb}</tpAmb>
+        <xServ>CONSULTAR</xServ>
+        <chNFe>${chave}</chNFe>
+      </consSitNFe>`;
+
+    const soapEnvelope = `
+      <soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                       xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                       xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
+        <soap12:Body>
+          <nfeConsultaNF2 xmlns="http://www.portalfiscal.inf.br/nfe/wsdl/NFeConsultaProtocolo4">
+            <nfeDadosMsg>${xmlBody}</nfeDadosMsg>
+          </nfeConsultaNF2>
+        </soap12:Body>
+      </soap12:Envelope>`;
+
+    const { data: soapResponse } = await axios.post(endpoint, soapEnvelope, {
+      httpsAgent,
+      headers: {
+        "Content-Type": "application/soap+xml; charset=utf-8",
+        "SOAPAction":
+          "http://www.portalfiscal.inf.br/nfe/wsdl/NFeConsultaProtocolo4/nfeConsultaNF2",
+      },
+      timeout: 40000,
+      validateStatus: () => true,
+    });
+
+    logs.soapResponse = soapResponse.slice(0, 500) + "...";
+
+    const xmlMatch = soapResponse.match(/<retConsSitNFe.*<\/retConsSitNFe>/s);
+    if (!xmlMatch) throw new Error("retConsSitNFe ausente no retorno da SEFAZ");
+
+    const parsed = xml2js(xmlMatch[0], { compact: true });
+    const ret = parsed.retConsSitNFe;
+
+    const cStat = ret.cStat?._text || "";
+    const xMotivo = ret.xMotivo?._text || "";
+    const dhRecbto = ret.protNFe?.infProt?.dhRecbto?._text;
+    const chNFe = ret.protNFe?.infProt?.chNFe?._text;
+
+    // Salva o log
+    const log = await this.prisma.nfeLog.create({
+      data: { cnpj, cStat, xMotivo, tpAmb, xmlEnviado: xmlBody, soapRaw: soapResponse },
+    });
+
+    // Se a nota for autorizada, salva no banco
+    if (["100", "101", "135", "150"].includes(cStat)) {
+      await this.prisma.nfeNota.upsert({
+        where: { numero: chNFe ?? chave },
+        update: { dataEmissao: dhRecbto, logId: log.id },
+        create: {
+          numero: chNFe ?? chave,
+          dataEmissao: dhRecbto,
+          emitente: "Emitente não identificado",
+          valor: 0,
+          logId: log.id,
+        },
+      });
+    }
+
+    return { cStat, xMotivo, dhRecbto, logs };
+  } catch (e: any) {
+    logs.erro = e.message;
+    return { erro: e.message, logs };
+  }
+}
+
   /** 🕒 Job automático a cada 1h10min */
   @Interval(70 * 60 * 1000)
   async executarConsultaAutomatica() {

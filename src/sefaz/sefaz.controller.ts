@@ -15,9 +15,7 @@ export class SefazController {
 
   /** 🔄 Consulta incremental (via certificado A1) */
   @Post("consultar")
-  @UseInterceptors(
-    FileFieldsInterceptor([{ name: "certificate", maxCount: 1 }])
-  )
+  @UseInterceptors(FileFieldsInterceptor([{ name: "certificate", maxCount: 1 }]))
   async consultar(
     @UploadedFiles() files: { certificate?: Express.Multer.File[] },
     @Body("cnpj") cnpj: string,
@@ -70,6 +68,33 @@ export class SefazController {
 
     return this.sefazService.consultarLotePorArquivo({
       arquivo,
+      cnpj,
+      password,
+      state: state ?? "SP",
+      tpAmb: tpAmb ?? "1",
+      certificateFile,
+    });
+  }
+
+  /** 🔑 Consulta direta por chave única (sem XLSX) */
+  @Post("consultar-chave")
+  @UseInterceptors(FileFieldsInterceptor([{ name: "certificate", maxCount: 1 }]))
+  async consultarChave(
+    @UploadedFiles() files: { certificate?: Express.Multer.File[] },
+    @Body("chave") chave: string,
+    @Body("cnpj") cnpj: string,
+    @Body("password") password: string,
+    @Body("state") state?: string,
+    @Body("tpAmb") tpAmb?: string
+  ) {
+    const certificateFile = files.certificate?.[0];
+    if (!certificateFile)
+      throw new BadRequestException("Certificado digital (.pfx) não enviado.");
+    if (!chave || !/^[0-9]{44}$/.test(chave))
+      throw new BadRequestException("Chave de NF-e inválida (precisa ter 44 dígitos).");
+
+    return this.sefazService.consultarPorChave({
+      chave,
       cnpj,
       password,
       state: state ?? "SP",
