@@ -1,0 +1,27 @@
+import { Body, Controller, Post } from "@nestjs/common";
+import { UauService } from "./uau.service";
+
+@Controller("uau")
+export class UauController {
+  constructor(private readonly uauService: UauService) {}
+
+  /** 🔍 Endpoint: autentica e consulta processos com base nos parâmetros do body */
+  @Post("consultar-processos")
+  async consultarProcessos(
+    @Body()
+    body: {
+      empresa: number;
+      obra: string;
+      periodoInicial: string;
+      periodoFinal: string;
+    }
+  ) {
+    const { empresa, obra, periodoInicial, periodoFinal } = body;
+    return this.uauService.consultarProcessos({
+      empresa,
+      obra,
+      periodoInicial,
+      periodoFinal,
+    });
+  }
+}
