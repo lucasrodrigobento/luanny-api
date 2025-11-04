@@ -1,0 +1,105 @@
+
+    <nfeProc xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
+      <NFe>
+        <infNFe Id="NFe35191111111111111111550010000012341000012345" versao="4.00">
+          <ide>
+            <cUF>35</cUF>
+            <cNF>00012345</cNF>
+            <natOp>VENDA DE MERCADORIAS</natOp>
+            <mod>55</mod>
+            <serie>1</serie>
+            <nNF>12345</nNF>
+            <dhEmi>2025-10-30T12:30:00-03:00</dhEmi>
+            <tpNF>1</tpNF>
+            <idDest>1</idDest>
+            <cMunFG>3550308</cMunFG>
+            <tpImp>1</tpImp>
+            <tpEmis>1</tpEmis>
+            <cDV>0</cDV>
+            <tpAmb>1</tpAmb>
+            <finNFe>1</finNFe>
+            <indFinal>1</indFinal>
+            <indPres>1</indPres>
+            <procEmi>0</procEmi>
+            <verProc>4.00</verProc>
+          </ide>
+          <emit>
+            <CNPJ>12345678000100</CNPJ>
+            <xNome>EMPRESA TESTE LTDA</xNome>
+            <xFant>EMPRESA TESTE</xFant>
+            <enderEmit>
+              <xLgr>Rua Exemplo</xLgr>
+              <nro>123</nro>
+              <xBairro>Centro</xBairro>
+              <cMun>3550308</cMun>
+              <xMun>São Paulo</xMun>
+              <UF>SP</UF>
+              <CEP>01000000</CEP>
+            </enderEmit>
+            <IE>123456789</IE>
+            <CRT>3</CRT>
+          </emit>
+          <dest>
+            <CPF>98765432100</CPF>
+            <xNome>CLIENTE A LTDA</xNome>
+            <enderDest>
+              <xLgr>Avenida Central</xLgr>
+              <nro>999</nro>
+              <xBairro>Centro</xBairro>
+              <cMun>3304557</cMun>
+              <xMun>Rio de Janeiro</xMun>
+              <UF>RJ</UF>
+              <CEP>20000000</CEP>
+            </enderDest>
+            <indIEDest>9</indIEDest>
+          </dest>
+          <det nItem="1">
+            <prod>
+              <cProd>ABC123</cProd>
+              <xProd>Produto de Teste 1</xProd>
+              <CFOP>5102</CFOP>
+              <uCom>UN</uCom>
+              <qCom>2.0000</qCom>
+              <vUnCom>789.22</vUnCom>
+              <vProd>1578.44</vProd>
+            </prod>
+          </det>
+          <det nItem="2">
+            <prod>
+              <cProd>XYZ789</cProd>
+              <xProd>Produto de Teste 3</xProd>
+              <CFOP>5102</CFOP>
+              <uCom>UN</uCom>
+              <qCom>1.0000</qCom>
+              <vUnCom>100.00</vUnCom>
+              <vProd>100.00</vProd>
+            </prod>
+          </det>
+          <total>
+            <ICMSTot>
+              <vBC>0.00</vBC>
+              <vICMS>0.00</vICMS>
+              <vICMSDeson>0.00</vICMSDeson>
+              <vFCP>0.00</vFCP>
+              <vProd>1678.44</vProd>
+              <vNF>1678.44</vNF>
+            </ICMSTot>
+          </total>
+          <transp>
+            <modFrete>0</modFrete>
+            <transporta>
+              <xNome>TRANSPORTADORA MOCK</xNome>
+              <CNPJ>55667788000122</CNPJ>
+              <xEnder>Rua das Entregas 45</xEnder>
+              <xMun>São Paulo</xMun>
+              <UF>SP</UF>
+            </transporta>
+            <veicTransp>
+              <placa>ABC1234</placa>
+              <UF>SP</UF>
+            </veicTransp>
+          </transp>
+        </infNFe>
+      </NFe>
+    </nfeProc>
+  

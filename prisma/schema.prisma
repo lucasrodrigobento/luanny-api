@@ -1,0 +1,88 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model NfeLog {
+  id          Int        @id @default(autoincrement())
+  cnpj        String
+  createdAt   DateTime   @default(now())
+  cStat       String?
+  xMotivo     String?
+  ultNSU      String?
+  tpAmb       String?
+  xmlEnviado  String?    @db.Text
+  soapRaw     String?    @db.Text
+  notas       NfeNota[]
+}
+
+model NfeNota {
+  id              Int          @id @default(autoincrement())
+  numero          String       @unique
+  dataEmissao     String?
+  cUF             String?
+  cNF             String?
+  natOp           String?
+  mod             String?
+  serie           String?
+  tpNF            String?
+  idDest          String?
+  cMunFG          String?
+  tpImp           String?
+  tpEmis          String?
+  cDV             String?
+  tpAmb           String?
+  finNFe          String?
+  indFinal        String?
+  indPres         String?
+  procEmi         String?
+  verProc         String?
+
+  emitente        String?
+  cnpjEmitente    String?
+  nomeFantasia    String?
+  ieEmitente      String?
+  crtEmitente     String?
+  enderecoEmitente String?
+
+  destinatario    String?
+  cpfDestinatario String?
+  enderecoDestinatario String?
+  indIEDest       String?
+
+  valor           Float?
+  vBC             Float?
+  vICMS           Float?
+  vICMSDeson      Float?
+  vFCP            Float?
+  vProd           Float?
+
+  modFrete        String?
+  transportadora  String?
+  cnpjTransportadora String?
+  enderecoTransportadora String?
+  placaVeiculo    String?
+  ufVeiculo       String?
+
+  logId           Int
+  log             NfeLog       @relation(fields: [logId], references: [id])
+  produtos        NfeProduto[]
+}
+
+model NfeProduto {
+  id            Int       @id @default(autoincrement())
+  nItem         Int?
+  codigo        String?
+  descricao     String?
+  cfop          String?
+  unidade       String?
+  quantidade    Float?
+  valorUnitario Float?
+  valorTotal    Float?
+  notaId        Int
+  nota          NfeNota   @relation(fields: [notaId], references: [id])
+}
