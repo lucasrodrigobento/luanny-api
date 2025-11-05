@@ -77,7 +77,22 @@ export class UauService {
         }
       );
 
-      return data;
+      const hoje = new Date();
+      // 🔽 Filtra os processos que têm pelo menos uma parcela:
+      // - com Status = 0
+      // - e DataPagamento inexistente OU maior que hoje
+      const processosFiltrados = data.filter((processo: any) =>
+        Array.isArray(processo.Parcelas) &&
+        processo.Parcelas.some((p: any) => {
+          if (p.Status !== 0) return false;
+
+          if (!p.DataPagamento) return true; // ainda não pago
+          const dataPagamento = new Date(p.DataPagamento);
+          return dataPagamento >= hoje; // só considera futuros ou iguais a hoje
+        })
+      );
+
+      return processosFiltrados;
     } catch (err: any) {
       throw new HttpException(
         `Erro ao consultar processos UAU: ${err.message}`,
