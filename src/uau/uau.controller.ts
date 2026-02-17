@@ -24,4 +24,17 @@ export class UauController {
       periodoFinal,
     });
   }
+
+  /** 📄 Endpoint: lista modelos de NF conforme empresa configurada (UAU_EMPRESA) */
+  @Post("modelos-nota")
+  async getModelosNota() {
+    return this.uauService.getModelosNF();
+  }
+
+  /** 🧾 Endpoint: gerar nova Nota Fiscal vinculada a um processo */
+  @Post("gerar-nota-fiscal")
+  async gerarNotaFiscal(@Body() body: any) {
+    // body será exatamente o payload esperado pela API do UAU
+    return this.uauService.gerarNotaFiscal(body);
+  }
 }
