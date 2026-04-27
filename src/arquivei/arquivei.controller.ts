@@ -1,5 +1,7 @@
 import { Controller, Get, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { ArquiveiService } from './arquivei.service';
+import { CurrentTenant } from '../tenant/decorators/current-tenant.decorator';
+import { Tenant } from '../tenant/entities/tenant.entity';
 
 @Controller('arquivei')
 export class ArquiveiController {
@@ -7,6 +9,7 @@ export class ArquiveiController {
 
   @Get('notas-fiscais')
   async getNotasFiscais(
+    @CurrentTenant() tenant: Tenant,
     @Query('cnpj') cnpj: string,
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
@@ -17,6 +20,6 @@ export class ArquiveiController {
         HttpStatus.BAD_REQUEST,
       );
     }
-    return this.arquiveiService.fetchNotasFiscais(cnpj, startDate, endDate);
+    return this.arquiveiService.fetchNotasFiscais(tenant.id, cnpj, startDate, endDate);
   }
 }

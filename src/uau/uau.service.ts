@@ -1,31 +1,35 @@
 import { Injectable, HttpException, Logger } from "@nestjs/common";
 import axios from "axios";
+import { TenantService } from "../tenant/tenant.service";
+import { UauConfig } from "../tenant/entities/tenant-config.entity";
 
 @Injectable()
 export class UauService {
   private readonly logger = new Logger(UauService.name);
-  private readonly baseUrlAuth = process.env.UAU_BASE_AUTH!;
-  private readonly baseUrlProcesso = process.env.UAU_BASE_PROCESSO!;
-  private readonly baseUrlGerarNF = process.env.UAU_BASE_GERAR_NF!;
-  private readonly empresaAlvo = (process.env.UAU_EMPRESA || 'VEGA').toUpperCase();
 
-  /** 🔐 1️⃣ Gera o authToken a partir das credenciais fixas do .env */
-  async autenticarUsuario(): Promise<string> {
+  constructor(private readonly tenantService: TenantService) {}
+
+  /** 🔐 1️⃣ Gera o authToken a partir das credenciais do tenant */
+  async autenticarUsuario(tenantId: string): Promise<string> {
     try {
-      const integrationToken = process.env.UAU_INTEGRATION_TOKEN!;
+      const tenantConfig = await this.tenantService.getUauConfig(tenantId);
+      const uauConfig = tenantConfig.config as UauConfig;
+
       const payload = {
-        login: process.env.UAU_LOGIN!,
-        senha: process.env.UAU_SENHA!,
-        UsuarioUAUSite: process.env.UAU_SITE!,
+        login: uauConfig.login,
+        senha: uauConfig.senha,
+        UsuarioUAUSite: uauConfig.site,
       };
 
+      const baseUrlAuth = uauConfig.baseUrlAuth || uauConfig.baseUrl;
+
       const { data } = await axios.post(
-        this.baseUrlAuth,
+        baseUrlAuth,
         payload,
         {
           headers: {
             "Content-Type": "application/json",
-            "X-INTEGRATION-Authorization": integrationToken,
+            "X-INTEGRATION-Authorization": uauConfig.integrationToken,
           },
           timeout: 20000,
         }
@@ -45,19 +49,23 @@ export class UauService {
 
   /** 🔍 2️⃣ Consulta processos com parâmetros recebidos no body */
   async consultarProcessos({
+    tenantId,
     empresa,
     obra,
     periodoInicial,
     periodoFinal,
   }: {
+    tenantId: string;
     empresa: number;
     obra: string;
     periodoInicial: string;
     periodoFinal: string;
   }): Promise<any> {
     try {
-      const integrationToken = process.env.UAU_INTEGRATION_TOKEN!;
-      const authToken = await this.autenticarUsuario();
+      const tenantConfig = await this.tenantService.getUauConfig(tenantId);
+      const uauConfig = tenantConfig.config as UauConfig;
+
+      const authToken = await this.autenticarUsuario(tenantId);
 
       const payload = {
         EmpresaObraPeriodo: {
@@ -67,13 +75,15 @@ export class UauService {
         },
       };
 
+      const baseUrlProcesso = uauConfig.baseUrlProcesso || uauConfig.baseUrl;
+
       const { data } = await axios.post(
-        this.baseUrlProcesso,
+        baseUrlProcesso,
         payload,
         {
           headers: {
             "Content-Type": "application/json",
-            "X-INTEGRATION-Authorization": integrationToken,
+            "X-INTEGRATION-Authorization": uauConfig.integrationToken,
             Authorization: authToken,
           },
           timeout: 30000,
@@ -96,7 +106,11 @@ export class UauService {
    *  não o código fiscal da nota ("55", "3", etc.).
    *  Por isso, "codigo" abaixo é o identificador interno usado em ModeloNF.ModeloNF.
    */
-  getModelosNF(): Array<{ codigo: number; descricao: string }> {
+  async getModelosNF(tenantId: string): Promise<Array<{ codigo: number; descricao: string }>> {
+    const tenantConfig = await this.tenantService.getUauConfig(tenantId);
+    const uauConfig = tenantConfig.config as UauConfig;
+    const empresaAlvo = (uauConfig.empresa || 'VEGA').toUpperCase();
+
     // Base compartilhada: códigos internos da tabela de modelos (ex.: 1,2,3...),
     // descrição exibindo também o código fiscal da NF.
     // LOCALIZA
@@ -116,7 +130,7 @@ export class UauService {
 
     // VEGA: por enquanto o UAU está utilizando os mesmos códigos internos da LOCALIZA
     // para o campo ModeloNF, então reaproveitamos a mesma base.
-    if (this.empresaAlvo === 'LOCALIZA') {
+    if (empresaAlvo === 'LOCALIZA') {
       return modelosLocaliza;
     }
     // Default (VEGA e demais): mesma codificação interna usada pelo UAU
@@ -124,20 +138,24 @@ export class UauService {
   }
 
   /** 🧾 3️⃣ Gerar nova Nota Fiscal vinculada a um processo */
-  async gerarNotaFiscal(payload: any): Promise<any> {
+  async gerarNotaFiscal(tenantId: string, payload: any): Promise<any> {
     try {
-      const integrationToken = process.env.UAU_INTEGRATION_TOKEN!;
-      const authToken = await this.autenticarUsuario();
+      const tenantConfig = await this.tenantService.getUauConfig(tenantId);
+      const uauConfig = tenantConfig.config as UauConfig;
+
+      const authToken = await this.autenticarUsuario(tenantId);
 
       this.logger.debug(`Gerar NF - payload enviado ao UAU: ${JSON.stringify(payload)}`);
 
+      const baseUrlGerarNF = uauConfig.baseUrlGerarNF || uauConfig.baseUrl;
+
       const { data } = await axios.post(
-        this.baseUrlGerarNF,
+        baseUrlGerarNF,
         payload,
         {
           headers: {
             "Content-Type": "application/json",
-            "X-INTEGRATION-Authorization": integrationToken,
+            "X-INTEGRATION-Authorization": uauConfig.integrationToken,
             Authorization: authToken,
           },
           timeout: 30000,
