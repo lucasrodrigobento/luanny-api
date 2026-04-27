@@ -8,7 +8,8 @@ dotenv.config(); // 👈 carrega as variáveis de ambiente do .env
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cors());
-  await app.listen(8000);
-  console.log(`🚀 API NF-e rodando em http://localhost:8000`);
+  const port = process.env.PORT || 8000;
+  await app.listen(port);
+  console.log(`🚀 API NF-e rodando em http://localhost:${port}`);
 }
 bootstrap();
