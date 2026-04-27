@@ -1,0 +1,54 @@
+flowchart TD
+    A([Operador acessa slug.luany.com.br]) --> B[API resolve tenant pelo subdomínio]
+    B --> C[(Carrega tenant_configs\nQIVE + UAU do banco)]
+    C --> D{Ambas integrações\nconfigurads?}
+
+    D -- Não --> E[/Redireciona para\nConfigurar Integrações/]
+    D -- Sim --> F[Operador seleciona:\nEmpresas, Obras, Período]
+
+    F --> G([Operador aciona RECONCILIAR])
+
+    G --> H{Busca paralela}
+
+    H --> I[QIVE\nGET /v1/nfe/received\ncnpjs do tenant + período]
+    H --> J[UAU\nPOST /ProcessoPagamento/ConsultarProcessos\nobras selecionadas + período]
+
+    I --> K{QIVE OK?}
+    J --> L{UAU OK?}
+
+    K -- Erro --> M[/Falha: QIVE indisponível/]
+    L -- Erro --> N[/Falha: UAU indisponível\nou auth falhou/]
+
+    K -- OK --> O[NFes QIVE]
+    L -- OK --> P[Processos UAU]
+
+    O --> Q
+    P --> Q[Motor de Reconciliação\ncalcularGap]
+
+    Q --> R{Para cada NFe do QIVE:\nbusca processo UAU com\nchaveNFe 44 dígitos\nOU número NF + CNPJ emitente}
+
+    R -- Encontrou --> S[NFe VINCULADA]
+    R -- Não encontrou --> T[NFe PENDENTE]
+
+    S --> U[Painel de Resultado]
+    T --> U
+
+    U --> V[Pendentes — ação necessária]
+    U --> W[Vinculadas — informativo]
+
+    V --> X{Ação do Operador}
+
+    X --> Y[Vincular a processo\nUAU existente\nPOST /uau/vincular-nfe]
+    X --> Z[Gerar nova NF\nno UAU\nPOST /ProcessoPagamento/GerarNotaFiscal]
+
+    Y --> AA([NFe resolvida])
+    Z --> AA
+
+    style A fill:#1e40af,color:#fff,stroke:#1e3a8a
+    style G fill:#1e40af,color:#fff,stroke:#1e3a8a
+    style AA fill:#15803d,color:#fff,stroke:#166534
+    style M fill:#dc2626,color:#fff,stroke:#b91c1c
+    style N fill:#dc2626,color:#fff,stroke:#b91c1c
+    style Q fill:#7c3aed,color:#fff,stroke:#6d28d9
+    style T fill:#d97706,color:#fff,stroke:#b45309
+    style S fill:#15803d,color:#fff,stroke:#166534

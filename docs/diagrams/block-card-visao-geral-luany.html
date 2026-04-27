@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Luany — Visão Geral do Sistema</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            color: #ffffff;
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 960px;
+            margin: 0 auto;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 36px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .header-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-text p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.55);
+            margin-top: 4px;
+        }
+
+        .badge {
+            margin-left: auto;
+            background: rgba(16,185,129,0.15);
+            border: 1px solid rgba(16,185,129,0.4);
+            color: #34d399;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 100px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Core concept */
+        .concept-box {
+            background: rgba(59,130,246,0.08);
+            border: 1px solid rgba(59,130,246,0.25);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .concept-icon { font-size: 32px; flex-shrink: 0; }
+
+        .concept-text h3 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #60a5fa;
+            margin-bottom: 8px;
+        }
+
+        .concept-text p {
+            font-size: 15px;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* Flow diagram */
+        .flow {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 32px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 28px 24px;
+            overflow: hidden;
+        }
+
+        .flow-node {
+            flex: 1;
+            text-align: center;
+        }
+
+        .flow-node .icon { font-size: 28px; margin-bottom: 8px; }
+        .flow-node .label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .flow-node .sublabel {
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+        }
+
+        .flow-arrow {
+            color: rgba(255,255,255,0.3);
+            font-size: 22px;
+            flex-shrink: 0;
+            padding: 0 8px;
+        }
+
+        .flow-node.highlight .icon-wrap {
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            border-radius: 12px;
+            padding: 10px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        /* Metrics grid */
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .metric {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 14px;
+            padding: 20px 16px;
+            text-align: center;
+        }
+
+        .metric .num {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .metric .desc {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            line-height: 1.4;
+        }
+
+        .metric.blue .num { color: #60a5fa; }
+        .metric.purple .num { color: #a78bfa; }
+        .metric.green .num { color: #34d399; }
+        .metric.orange .num { color: #fb923c; }
+
+        /* Integrations */
+        .integrations {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .integration-card {
+            border-radius: 14px;
+            padding: 20px;
+            border: 1px solid;
+        }
+
+        .integration-card.qive {
+            background: rgba(59,130,246,0.07);
+            border-color: rgba(59,130,246,0.25);
+        }
+
+        .integration-card.uau {
+            background: rgba(139,92,246,0.07);
+            border-color: rgba(139,92,246,0.25);
+        }
+
+        .integration-card h4 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .integration-card.qive h4 { color: #60a5fa; }
+        .integration-card.uau h4 { color: #a78bfa; }
+
+        .integration-card ul {
+            list-style: none;
+            font-size: 12px;
+            color: rgba(255,255,255,0.65);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .integration-card ul li::before {
+            content: "→ ";
+            opacity: 0.5;
+        }
+
+        /* Module status */
+        .modules {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 28px;
+        }
+
+        .modules h3 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 16px;
+        }
+
+        .module-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .module-row:last-child { border-bottom: none; }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-dot.done { background: #34d399; }
+        .status-dot.pending { background: #fb923c; }
+        .status-dot.missing { background: #f87171; }
+
+        .module-name {
+            font-size: 13px;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .module-status {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* Footer */
+        .footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            font-size: 11px;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .stack-tags { display: flex; gap: 8px; }
+
+        .tag {
+            background: rgba(255,255,255,0.07);
+            border-radius: 6px;
+            padding: 3px 10px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+
+        <div class="header">
+            <div class="logo">🔄</div>
+            <div class="header-text">
+                <h1>Luany</h1>
+                <p>SaaS de Reconciliação de Notas Fiscais · Multi-tenant</p>
+            </div>
+            <div class="badge">Em Desenvolvimento</div>
+        </div>
+
+        <div class="concept-box">
+            <div class="concept-icon">💡</div>
+            <div class="concept-text">
+                <h3>Propósito Central</h3>
+                <p>Para cada empresa cliente, o sistema cruza as NFes recebidas no QIVE com os processos de pagamento registrados no UAU — identificando o <strong style="color:#fbbf24">gap</strong>: notas que existem na SEFAZ mas não estão cadastradas no ERP.</p>
+            </div>
+        </div>
+
+        <div class="flow">
+            <div class="flow-node">
+                <div class="icon">📡</div>
+                <div class="label">QIVE</div>
+                <div class="sublabel">NFes recebidas<br>por CNPJ</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node highlight">
+                <div class="icon-wrap">
+                    <div class="icon">⚖️</div>
+                </div>
+                <div class="label">Reconciliação</div>
+                <div class="sublabel">chaveNFe OU<br>nº + CNPJ emitente</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+                <div class="icon">🏗️</div>
+                <div class="label">UAU ERP</div>
+                <div class="sublabel">Processos de<br>pagamento</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+                <div class="icon">⚠️</div>
+                <div class="label">Gap</div>
+                <div class="sublabel">NFes pendentes<br>→ ação do operador</div>
+            </div>
+        </div>
+
+        <div class="metrics">
+            <div class="metric blue">
+                <div class="num">N</div>
+                <div class="desc">Tenants<br>ilimitados</div>
+            </div>
+            <div class="metric purple">
+                <div class="num">2</div>
+                <div class="desc">Integrações<br>obrigatórias</div>
+            </div>
+            <div class="metric green">
+                <div class="num">44</div>
+                <div class="desc">Dígitos da<br>chave NF-e</div>
+            </div>
+            <div class="metric orange">
+                <div class="num">3</div>
+                <div class="desc">Ações sobre<br>NFe pendente</div>
+            </div>
+        </div>
+
+        <div class="integrations">
+            <div class="integration-card qive">
+                <h4>📡 QIVE (ex-Arquivei)</h4>
+                <ul>
+                    <li>Base URL + API ID + API Key</li>
+                    <li>CNPJs monitorados (por tenant)</li>
+                    <li>GET /v1/nfe/received</li>
+                    <li>Paginação automática (&gt;50 NFes)</li>
+                </ul>
+            </div>
+            <div class="integration-card uau">
+                <h4>🏗️ UAU (Globaltec)</h4>
+                <ul>
+                    <li>Base URL + Integration Token (JWE)</li>
+                    <li>Login + Senha + Site por tenant</li>
+                    <li>Auth em 2 níveis (JWE + sessão)</li>
+                    <li>Cache token 30 min por tenant</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="modules">
+            <h3>Status dos Módulos — Backend</h3>
+            <div class="module-row">
+                <div class="status-dot done"></div>
+                <div class="module-name">ArquiveiModule — GET /arquivei/notas-fiscais</div>
+                <div class="module-status">implementado (sem multi-tenant)</div>
+            </div>
+            <div class="module-row">
+                <div class="status-dot done"></div>
+                <div class="module-name">UauModule — consultar + gerar NF</div>
+                <div class="module-status">implementado (sem multi-tenant)</div>
+            </div>
+            <div class="module-row">
+                <div class="status-dot missing"></div>
+                <div class="module-name">TenantModule — resolve tenant por subdomínio</div>
+                <div class="module-status">não existe — criar</div>
+            </div>
+            <div class="module-row">
+                <div class="status-dot missing"></div>
+                <div class="module-name">ConfiguracaoIntegracaoModule — CRUD QIVE + UAU</div>
+                <div class="module-status">não existe — criar</div>
+            </div>
+            <div class="module-row">
+                <div class="status-dot missing"></div>
+                <div class="module-name">ReconciliacaoModule — calcularGap(tenant, filtros)</div>
+                <div class="module-status">não existe — núcleo do produto</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>Luany · abril 2026</div>
+            <div class="stack-tags">
+                <span class="tag">NestJS 11</span>
+                <span class="tag">React 19</span>
+                <span class="tag">PostgreSQL</span>
+                <span class="tag">TypeScript 5.7</span>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
